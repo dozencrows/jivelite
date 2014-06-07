@@ -33,7 +33,7 @@ struct jive_perfwarn perfwarn = { 0, 0, 0, 0, 0, 0 };
 
 #define LONG_HOLD_TIMEOUT 3500
 
-#define POINTER_TIMEOUT 20000
+//#define POINTER_TIMEOUT 20000
 
 static bool update_screen = true;
 
@@ -74,7 +74,7 @@ static Uint32 mouse_timeout = 0;
 static Uint32 mouse_long_timeout = 0;
 static Uint32 mouse_timeout_arg;
 
-static Uint32 pointer_timeout = 0;
+//static Uint32 pointer_timeout = 0;
 
 static Uint16 mouse_origin_x, mouse_origin_y;
 
@@ -1085,10 +1085,10 @@ static int process_event(lua_State *L, SDL_Event *event) {
 	case SDL_MOUSEMOTION:
 
 		/* show mouse cursor */
-		if (pointer_timeout == 0) {
-			SDL_ShowCursor(SDL_ENABLE);
-		}
-		pointer_timeout = now + POINTER_TIMEOUT;
+		//if (pointer_timeout == 0) {
+		//	SDL_ShowCursor(SDL_ENABLE);
+		//}
+		//pointer_timeout = now + POINTER_TIMEOUT;
 
 		if (event->motion.state & SDL_BUTTON(1)) {
 			if ( (mouse_state == MOUSE_STATE_DOWN || mouse_state == MOUSE_STATE_SENT)) {
@@ -1336,10 +1336,10 @@ static void process_timers(lua_State *L) {
 	memset(&jevent, 0, sizeof(JiveEvent));
 	jevent.ticks = now = jive_jiffies();
 
-	if (pointer_timeout && pointer_timeout < now) {
-		SDL_ShowCursor(SDL_DISABLE);
-		pointer_timeout = 0;
-	}
+	//if (pointer_timeout && pointer_timeout < now) {
+	//	SDL_ShowCursor(SDL_DISABLE);
+	//	pointer_timeout = 0;
+	//}
 
 	if (mouse_timeout && mouse_timeout < now) {
 		if (mouse_state == MOUSE_STATE_DOWN) {
