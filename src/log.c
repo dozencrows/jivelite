@@ -18,7 +18,7 @@
 #define LOG_BUFFER_SIZE 512
 
 static enum log_priority appender_stdout = LOG_PRIORITY_DEBUG;
-static enum log_priority appender_syslog = LOG_PRIORITY_OFF;
+static enum log_priority appender_syslog = LOG_PRIORITY_DEBUG;
 
 static struct log_category *category_head = NULL;
 
