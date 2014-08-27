@@ -247,6 +247,12 @@ static int jiveL_initSDL(lua_State *L) {
 	}
 
 	if (splash) {
+		if (screen_w < splash_w || screen_h < splash_h) {
+			JiveSurface* resized = jive_surface_resize(splash, screen_w, screen_h, false);
+			jive_surface_free(splash);
+			splash = resized;	
+		}
+
 		jive_surface_blit(splash, srf, MAX(0, (screen_w - splash_w) / 2), MAX(0, (screen_h - splash_h) / 2));
 		jive_surface_flip(srf);
 	}

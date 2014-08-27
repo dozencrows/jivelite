@@ -207,8 +207,10 @@ static void _load_image (Uint16 index, bool hasAlphaFlags, Uint32 alphaFlags) {
 	}
 	SDL_FreeSurface(tmp);
 
-	if (!srf)
+	if (!srf) {
+		LOG_WARN(log_ui_draw, "Error setting up surface for tile image %s: %s\n", image->path, SDL_GetError());
 		return;
+	}
 
 	if (hasAlphaFlags) {
 		SDL_SetAlpha(srf, alphaFlags, 0);
@@ -401,13 +403,14 @@ static void _get_tile_surfaces(JiveTile *tile, SDL_Surface *srf[9], bool load) {
 
 static SDL_Surface *get_image_surface(JiveTile *tile) {
 	if (!IS_DYNAMIC_IMAGE(tile)) {
-		//LOG_ERROR(log_ui_draw, "no SDL surface available");
+		LOG_ERROR(log_ui_draw, "no SDL surface available");
 		return NULL;
 	}
 
 	_load_tile_images(tile);
-	if (!images[tile->image[0]].loaded)
+	if (!images[tile->image[0]].loaded) {
 		return NULL;
+	}
 
 	return images[tile->image[0]].loaded->srf;
 }
