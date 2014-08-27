@@ -12,6 +12,7 @@ local Surface          = require("jive.ui.Surface")
 local Icon             = require("jive.ui.Icon")
 local Timer            = require("jive.ui.Timer")
 local Applet           = require("jive.Applet")
+local GPIO             = require("jive.ui.GPIO")
 
 local jnt              = jnt
 local appletManager    = appletManager
@@ -87,7 +88,9 @@ function _screen(self, state)
 	if state == "on" then
 		timer:stop()
 		Framework:setUpdateScreen(true)
+		GPIO.output(252, 1)
 	else
 		timer:start()
+		GPIO.output(252, 0)
 	end
 end

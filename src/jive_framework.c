@@ -180,6 +180,27 @@ int jive_traceback (lua_State *L) {
 	return 1;
 }
 
+static const char* GPIO_VALUE_PATH = "/sys/class/gpio/gpio%d/value";
+
+static int jiveL_gpio_output(lua_State *L) {
+	char gpio_path[PATH_MAX];
+	lua_Integer gpio_port = lua_tointeger(L, 1);
+	lua_Integer gpio_value = lua_tointeger(L, 2);
+
+	sprintf(gpio_path, GPIO_VALUE_PATH, gpio_port); 
+	FILE* gpio_file = fopen(gpio_path, "w");
+	if (gpio_file) {
+		char out_value[16];
+		sprintf(out_value, "%d", gpio_value);
+		fputs(out_value, gpio_file);
+		fclose(gpio_file);
+	}
+	else {
+		LOG_ERROR(log_ui_draw, "Cannot open GPIO: %s\n", gpio_path);
+	}
+
+	return 0;
+}
 
 static int jiveL_initSDL(lua_State *L) {
 	const SDL_VideoInfo *video_info;
@@ -1617,7 +1638,10 @@ static const struct luaL_Reg core_methods[] = {
 	{ NULL, NULL }
 };
 
-
+static const struct luaL_Reg gpio_methods[] = {
+	{ "output", jiveL_gpio_output },
+	{ NULL, NULL }
+};
 
 static int jiveL_core_init(lua_State *L) {
 
@@ -1696,6 +1720,10 @@ static int jiveL_core_init(lua_State *L) {
 
 	lua_getfield(L, 2, "Framework");
 	luaL_register(L, NULL, core_methods);
+	lua_pop(L, 1);
+
+	lua_getfield(L, 2, "GPIO");
+	luaL_register(L, NULL, gpio_methods);
 	lua_pop(L, 1);
 
 	return 0;

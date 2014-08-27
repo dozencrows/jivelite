@@ -224,9 +224,11 @@ end
 
 -- defines a new style that inherrits from an existing style
 local function _uses(parent, value)
-	if parent == nil then
-		log:warn("nil parent in _uses at:\n", debug.traceback())
-	end
+--
+-- Disable this warning for now; doesn't cause a problem, but spams the log at startup
+--	if parent == nil then
+--		log:warn("nil parent in _uses at:\n", debug.traceback())
+--	end
 	local style = {}
 	setmetatable(style, { __index = parent })
 	for k,v in pairs(value or {}) do
