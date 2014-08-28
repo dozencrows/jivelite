@@ -768,6 +768,7 @@ int jive_style_array_int(lua_State *L, int index, const char *array, int n, cons
 
 
 JiveFont *jive_style_array_font(lua_State *L, int index, const char *array, int n, const char *key) {
+	void *lua_value;
 	JiveFont *value;
 
 	JIVEL_STACK_CHECK_BEGIN(L);
@@ -780,7 +781,15 @@ JiveFont *jive_style_array_font(lua_State *L, int index, const char *array, int 
 	lua_pushnil(L);
 	lua_call(L, 5, 1);
 
-	value = *(JiveFont **)lua_touserdata(L, -1);
+	lua_value = lua_touserdata(L, -1);
+
+	if (lua_value) {
+		value = *(JiveFont **)lua_touserdata(L, -1);
+	}
+	else {
+		value = NULL;
+	}
+
 	lua_pop(L, 1);
 
 	JIVEL_STACK_CHECK_END(L);
