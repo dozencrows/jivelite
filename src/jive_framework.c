@@ -33,7 +33,7 @@ struct jive_perfwarn perfwarn = { 0, 0, 0, 0, 0, 0 };
 
 #define LONG_HOLD_TIMEOUT 3500
 
-//#define POINTER_TIMEOUT 20000
+#define POINTER_TIMEOUT 20000
 
 static bool update_screen = true;
 
@@ -74,7 +74,7 @@ static Uint32 mouse_timeout = 0;
 static Uint32 mouse_long_timeout = 0;
 static Uint32 mouse_timeout_arg;
 
-//static Uint32 pointer_timeout = 0;
+static Uint32 pointer_timeout = 0;
 
 static Uint16 mouse_origin_x, mouse_origin_y;
 
@@ -197,6 +197,25 @@ static int jiveL_gpio_output(lua_State *L) {
 	}
 	else {
 		LOG_ERROR(log_ui_draw, "Cannot open GPIO: %s\n", gpio_path);
+	}
+
+	return 0;
+}
+
+static const char* BACKLIGHT_VALUE_PATH = "/sys/class/backlight/soc:backlight/brightness";
+
+static int jiveL_backlight_output(lua_State *L) {
+	lua_Integer value = lua_tointeger(L, 1);
+
+	FILE* backlight_file = fopen(BACKLIGHT_VALUE_PATH, "w");
+	if (backlight_file) {
+		char out_value[16];
+		sprintf(out_value, "%d", value);
+		fputs(out_value, backlight_file);
+		fclose(backlight_file);
+	}
+	else {
+		LOG_ERROR(log_ui_draw, "Cannot open BACKLIGHT: %s\n", BACKLIGHT_VALUE_PATH);
 	}
 
 	return 0;
@@ -1112,10 +1131,10 @@ static int process_event(lua_State *L, SDL_Event *event) {
 	case SDL_MOUSEMOTION:
 
 		/* show mouse cursor */
-		//if (pointer_timeout == 0) {
-		//	SDL_ShowCursor(SDL_ENABLE);
-		//}
-		//pointer_timeout = now + POINTER_TIMEOUT;
+		if (pointer_timeout == 0) {
+			SDL_ShowCursor(SDL_ENABLE);
+		}
+		pointer_timeout = now + POINTER_TIMEOUT;
 
 		if (event->motion.state & SDL_BUTTON(1)) {
 			if ( (mouse_state == MOUSE_STATE_DOWN || mouse_state == MOUSE_STATE_SENT)) {
@@ -1363,10 +1382,10 @@ static void process_timers(lua_State *L) {
 	memset(&jevent, 0, sizeof(JiveEvent));
 	jevent.ticks = now = jive_jiffies();
 
-	//if (pointer_timeout && pointer_timeout < now) {
-	//	SDL_ShowCursor(SDL_DISABLE);
-	//	pointer_timeout = 0;
-	//}
+	if (pointer_timeout && pointer_timeout < now) {
+		SDL_ShowCursor(SDL_DISABLE);
+		pointer_timeout = 0;
+	}
 
 	if (mouse_timeout && mouse_timeout < now) {
 		if (mouse_state == MOUSE_STATE_DOWN) {
@@ -1640,6 +1659,7 @@ static const struct luaL_Reg core_methods[] = {
 
 static const struct luaL_Reg gpio_methods[] = {
 	{ "output", jiveL_gpio_output },
+	{ "backlight", jiveL_backlight_output },
 	{ NULL, NULL }
 };
 

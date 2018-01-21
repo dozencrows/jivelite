@@ -88,9 +88,9 @@ function _screen(self, state)
 	if state == "on" then
 		timer:stop()
 		Framework:setUpdateScreen(true)
-		GPIO.output(252, 1)
+		GPIO.backlight(1)
 	else
 		timer:start()
-		GPIO.output(252, 0)
+		GPIO.backlight(0)
 	end
 end
